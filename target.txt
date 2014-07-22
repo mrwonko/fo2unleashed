@@ -1,0 +1,14 @@
+* load a dll containing custom code
+* find location of code in executable (mandatory or optional)
+	* based on patterns including wildcards
+	* original code must not be contained in pattern for copyright reasons
+	* -> so maybe save code as (byte >> 1) and make anything with 0x80 set special, e.g. a wildcard?
+
+struct Search
+{
+	bool mandatory;
+	std::uint8_t * pattern;
+	std::uint32_t patternLength;
+}
+
+void setupHooks()
