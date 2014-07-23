@@ -18,14 +18,14 @@ public:
   NFA( NFA&& rhs );
   NFA& operator=( NFA&& rhs );
 
-  /// Will reject duplicate entries, but not overlapping ones
   bool insert( const PatternChar* data, size_t length, const void* id );
 
   const NFANode* root() const { return m_nodes.front().get(); }
+  NFANode* root() { return m_nodes.front().get(); }
+  void clear() { m_nodes.clear(); }
 
 private:
-  NFANode* root() { return m_nodes.front().get(); }
-  bool insert( NFANode* node, const PatternChar* it, const PatternChar* end, const void* id );
+  bool insert( NFANode* node, const PatternChar* it, const PatternChar* end, size_t length, const void* id );
 
 private:
   std::vector< std::unique_ptr< NFANode > > m_nodes;

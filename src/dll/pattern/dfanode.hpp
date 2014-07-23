@@ -1,17 +1,24 @@
 #pragma once
 
-#include <cstring>
+#include <map>
+#include <utility>
 
 /**
 Node in a Deterministic Finite Automaton (State Machine)
 **/
 struct DFANode
 {
-  const void* match = nullptr;
+  std::map< const void*, size_t > matches;
   DFANode* next[ 256 ];
 
-  DFANode( const void* match )
-    : match( match )
+  DFANode()
+    : next{}
+  {
+  };
+
+  explicit DFANode( std::map< const void*, size_t >&& matches )
+    : matches( std::move( matches ) )
+    , next{}
   {
   }
 };

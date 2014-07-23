@@ -9,6 +9,6 @@ Node in a Nondeterministic Finite Automaton (State Machine)
 **/
 struct NFANode
 {
-  const void* match = nullptr;
+  std::map< const void*, size_t > matches; ///< matches by length
   std::map< PatternChar, NFANode* > next;
 };

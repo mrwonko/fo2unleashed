@@ -20,13 +20,13 @@ class DFA
 {
 public:
   /// @throws DuplicateEntryException
-  DFA( const NFA& nfa );
+  DFA( NFA&& nfa );
 
-  /// @param onMatch function to call on match, first parameter *first char past match*.
-  void run( const char* data, const size_t length, std::function< void( const char *, const void* ) > onMatch ) const;
+  /// @param onMatch function to call on match, first parameter is offset to start of match.
+  void run( const char* data, const size_t length, std::function< void( ptrdiff_t, const void* ) > onMatch ) const;
 
 private:
-  DFANode* mkNode( const void* match = nullptr );
+  DFANode* mkNode( std::map< const void*, size_t >&& matches );
   const DFANode* root() const { return m_nodes.front().get(); }
 
 private:

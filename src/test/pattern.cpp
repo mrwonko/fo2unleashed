@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <utility>
 
 int main( int argc, char** argv )
 {
@@ -28,13 +29,13 @@ int main( int argc, char** argv )
   }
   try
   {
-    DFA dfa( nfa );
+    DFA dfa( std::move( nfa ) );
     std::cout << "Enter text to search in." << std::endl;
     std::getline( std::cin, input );
-    dfa.run( input.data(), input.size(), [ &input ]( const char * position, const void* match )
+    dfa.run( input.data(), input.size(), [ &input ]( ptrdiff_t position, const void* match )
     {
       const std::string& needle = *reinterpret_cast< const std::string* >( match );
-      std::cout << "Found \"" << needle << "\" at " << ( position - input.data() - needle.size() ) << std::endl;
+      std::cout << "Found \"" << needle << "\" at " << position << std::endl;
     } );
   }
   catch( DuplicateEntryException )

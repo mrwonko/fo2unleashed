@@ -6,11 +6,11 @@
 #include <set>
 #include <utility>
 
-DFA::DFA( const NFA& nfa )
+DFA::DFA( NFA&& nfa )
 {
-  typedef std::set< const NFANode* > State;
-  const NFANode* root = nfa.root();
-  std::map< State, DFANode* > unhandledNodes{ std::make_pair( State{ root }, mkNode( root->match ) ) };
+  typedef std::set< NFANode* > State;
+  NFANode* root = nfa.root();
+  std::map< State, DFANode* > unhandledNodes{ std::make_pair( State{ root }, mkNode( std::move( root->matches ) ) ) };
   std::map< State, DFANode* > allNodes( unhandledNodes );
   // Function to retrieve a node, or create it if necessary
   const auto getNode = [ &allNodes, &unhandledNodes, this ]( const State& state )
@@ -18,17 +18,19 @@ DFA::DFA( const NFA& nfa )
     const auto entry = allNodes.find( state );
     if( entry == allNodes.end() )
     {
+      std::map< const void*, size_t > matches;
       const void* match = nullptr;
       for( const NFANode* node : state )
       {
-        if( node->match )
+        for( auto& match : node->matches )
         {
-          // Duplicates?
-          if( match ) throw DuplicateEntryException();
-          match = node->match;
+          if( !matches.emplace( match.first, match.second ).second )
+          {
+            throw DuplicateEntryException();
+          }
         }
       }
-      DFANode* result = mkNode( match );
+      DFANode* result = mkNode( std::move( matches ) );
       unhandledNodes[ state ] = result;
       allNodes[ state ] = result;
       return result;
@@ -68,22 +70,26 @@ DFA::DFA( const NFA& nfa )
     }
     unhandledNodes.erase( unhandled );
   }
+  nfa.clear();
 }
 
-DFANode* DFA::mkNode( const void * match )
+DFANode* DFA::mkNode( std::map< const void*, size_t >&& matches )
 {
-  m_nodes.emplace_back( new DFANode( match ) );
+  m_nodes.emplace_back( new DFANode( std::move( matches ) ) );
   return m_nodes.back().get();
 }
 
-void DFA::run( const char* data, const size_t length, std::function< void( const char *, const void* ) > onMatch ) const
+void DFA::run( const char* data, const size_t length, std::function< void( ptrdiff_t, const void* ) > onMatch ) const
 {
   const DFANode* curNode = root();
   const char * it = data;
   const char * const end = data + length;
   while( true )
   {
-    if( curNode->match ) onMatch( reinterpret_cast< const char * >( it ), curNode->match );
+    for( auto& match : curNode->matches )
+    {
+      onMatch( reinterpret_cast< const char * >( it - match.second ) - data, match.first );
+    }
     if( it == end ) break;
     curNode = curNode->next[ *reinterpret_cast< const unsigned char * >( it ) ];
     ++it;

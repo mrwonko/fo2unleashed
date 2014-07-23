@@ -22,33 +22,27 @@ NFA& NFA::operator=( NFA&& rhs )
 
 bool NFA::insert( const PatternChar* data, size_t length, const void* id )
 {
-  if( !id ) return false;
-  return insert( root(), data, data + length, id );
+  return insert( root(), data, data + length, length, id );
 }
 
-bool NFA::insert( NFANode* node, const PatternChar* it, const PatternChar* end, const void* id )
+bool NFA::insert( NFANode* node, const PatternChar* it, const PatternChar* end, size_t length, const void* id )
 {
   // Match for this node
   if( it == end )
   {
-    if( node->match )
-    {
-      return false;
-    }
-    node->match = id;
-    return true;
+    return node->matches.emplace( id, length ).second;
   }
   // Match for child
   auto entry = node->next.find( *it );
   if( entry != node->next.end() )
   {
     // existing child
-    return insert( entry->second, it + 1, end, id );
+    return insert( entry->second, it + 1, end, length, id );
   }
   // new child
   m_nodes.emplace_back( new NFANode() );
   auto newNode = m_nodes.back().get();
-  bool success = insert( newNode, it + 1, end, id ); // not super efficient, but same big-O as most efficient solution
+  bool success = insert( newNode, it + 1, end, length, id ); // not super efficient, but same big-O as most efficient solution
   assert( success );
   node->next.emplace( *it, newNode );
   return true;
