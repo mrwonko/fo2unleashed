@@ -30,6 +30,8 @@ set( PatternFiles
 add_library( FO2Unleashed SHARED
 	src/dll/main.cpp
 	src/dll/logger.hpp src/dll/logger.cpp
+	src/dll/memory/region.hpp src/dll/memory/region.cpp
+	src/dll/memory/memory.hpp src/dll/memory/memory.cpp
 	${PatternFiles}
 	)
 target_compile_definitions( FO2Unleashed PUBLIC PSAPI_VERSION=1 ) # psapi v1 is backwards compatible with WinXP
