@@ -10,8 +10,9 @@ public:
     Error,
     Warning,
     Info,
+    Verbose,
     None,
-    Default = Info,
+    Default = Verbose,
   };
 
 public:
@@ -26,6 +27,8 @@ public:
 
 public:
   void setLogLevel( const LogLevel logLevel ) { m_logLevel = logLevel; }
+  template< typename... Args >
+  void verbose( Args... args ) { log( LogLevel::Verbose, args... ); }
   template< typename... Args >
   void info( Args... args ) { log( LogLevel::Info, args... ); }
   template< typename... Args >

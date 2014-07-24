@@ -32,6 +32,11 @@ add_library( FO2Unleashed SHARED
 	src/dll/logger.hpp src/dll/logger.cpp
 	src/dll/memory/region.hpp src/dll/memory/region.cpp
 	src/dll/memory/memory.hpp src/dll/memory/memory.cpp
+	src/dll/signature.hpp src/dll/signature.cpp
+	src/dll/patches.hpp src/dll/patches.cpp
+	src/dll/addresses.hpp src/dll/addresses.cpp
+	src/dll/fo2api.hpp src/dll/fo2api.cpp
+	src/dll/fo2apibridge.asm
 	${PatternFiles}
 	)
 target_compile_definitions( FO2Unleashed PUBLIC PSAPI_VERSION=1 ) # psapi v1 is backwards compatible with WinXP

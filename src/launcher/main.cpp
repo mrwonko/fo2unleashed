@@ -352,6 +352,8 @@ static bool createProcess( const std::string& processName, const std::string& co
     return false;
   }
 
+  // TODO: in Steam version, delay injection until code has been decrypted/modified
+
   // Inject DLL
   if( !injectDLL( dllName, info ) )
   {

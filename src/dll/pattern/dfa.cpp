@@ -79,7 +79,7 @@ DFANode* DFA::mkNode( std::map< const void*, size_t >&& matches )
   return m_nodes.back().get();
 }
 
-void DFA::run( const char* data, const size_t length, std::function< void( ptrdiff_t, const void* ) > onMatch ) const
+bool DFA::run( const char* data, const size_t length, std::function< bool( ptrdiff_t, const void* ) > onMatch ) const
 {
   const DFANode* curNode = root();
   const char * it = data;
@@ -88,10 +88,14 @@ void DFA::run( const char* data, const size_t length, std::function< void( ptrdi
   {
     for( auto& match : curNode->matches )
     {
-      onMatch( reinterpret_cast< const char * >( it - match.second ) - data, match.first );
+      if( !onMatch( reinterpret_cast< const char * >( it - match.second ) - data, match.first ) )
+      {
+        return false;
+      }
     }
     if( it == end ) break;
     curNode = curNode->next[ *reinterpret_cast< const unsigned char * >( it ) ];
     ++it;
   }
+  return true;
 }

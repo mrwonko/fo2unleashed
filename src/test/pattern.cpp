@@ -36,6 +36,7 @@ int main( int argc, char** argv )
     {
       const std::string& needle = *reinterpret_cast< const std::string* >( match );
       std::cout << "Found \"" << needle << "\" at " << position << std::endl;
+      return true;
     } );
   }
   catch( DuplicateEntryException )

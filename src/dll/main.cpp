@@ -4,6 +4,7 @@
 #include "logger.hpp"
 #include "memory/memory.hpp"
 #include "memory/region.hpp"
+#include "patches.hpp"
 
 #include <vector>
 
@@ -23,6 +24,8 @@ BOOL APIENTRY DllMain( HINSTANCE hinstDLL, DWORD  fdwReason, LPVOID lpvReserved 
 
   std::vector< Region > regions;
   if( !getExecutableRegions( regions ) ) return FALSE;
+
+  if( !applyPatches( regions ) ) return FALSE;
 
   MessageBoxA( nullptr, "DLL Says hi!", "Hi!", MB_OK | MB_ICONINFORMATION );
 

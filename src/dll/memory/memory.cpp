@@ -93,11 +93,11 @@ bool getExecutableRegions( std::vector< Region >& out_regions )
     }
     if( info.Protect & ( PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY ) )
     {
-      logger.info( "Found executable page(s) of size 0x", std::hex, info.RegionSize, " at 0x", info.BaseAddress, std::dec );
+      logger.verbose( "Found executable page(s) of size 0x", std::hex, info.RegionSize, " at 0x", info.BaseAddress, "; protection: 0x", info.Protect, std::dec );
       auto modifiers = info.Protect & ~0xFF;
       try
       {
-        out_regions.emplace_back( info.BaseAddress, info.RegionSize, PAGE_EXECUTE_READWRITE | modifiers );
+        out_regions.emplace_back( reinterpret_cast< char* >( info.BaseAddress ), info.RegionSize, PAGE_EXECUTE_READWRITE | modifiers );
       }
       catch( std::runtime_error& e )
       {
@@ -105,6 +105,10 @@ bool getExecutableRegions( std::vector< Region >& out_regions )
         out_regions.clear();
         return false;
       }
+    }
+    else
+    {
+      logger.verbose( "Found non-executable page(s) of size 0x", std::hex, info.RegionSize, " at 0x", info.BaseAddress, "; protection: 0x", info.Protect, std::dec );
     }
 
     std::ptrdiff_t startOffset = start - reinterpret_cast< char* >( info.BaseAddress );

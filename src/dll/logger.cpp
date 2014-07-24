@@ -35,6 +35,8 @@ const char* Logger::levelName( LogLevel logLevel )
     return "Warning";
   case LogLevel::Info:
     return "Info";
+  case LogLevel::Verbose:
+    return "Verbose";
   default:
     return "";
   }
