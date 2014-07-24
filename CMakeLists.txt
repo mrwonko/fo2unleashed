@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.8.8 )
+cmake_minimum_required( VERSION 3.0 )
 
 project( FO2Unleashed )
 enable_language( ASM_MASM )
@@ -29,8 +29,11 @@ set( PatternFiles
 
 add_library( FO2Unleashed SHARED
 	src/dll/main.cpp
+	src/dll/logger.hpp src/dll/logger.cpp
 	${PatternFiles}
 	)
+target_compile_definitions( FO2Unleashed PUBLIC PSAPI_VERSION=1 ) # psapi v1 is backwards compatible with WinXP
+target_link_libraries( FO2Unleashed Psapi.lib ) # psapi v1 uses psapi.lib, not kernel32.lib
 
 add_executable( PatternTest
 	src/test/pattern.cpp
