@@ -373,16 +373,8 @@ static bool createProcess( const std::string& processName, const std::string& co
 
 int main( const int argc, const char** argv )
 {
-  std::vector< char > buf( 1024 );
-  buf.resize( GetCurrentDirectoryA( buf.size(), buf.data() ) );
-  std::string currentDirectory( buf.data(), buf.size() );
-  if( !currentDirectory.empty() )
-  {
-    currentDirectory += '\\';
-  }
   const std::string processName = "FlatOut2.exe";
-  const std::string dllName = currentDirectory + "FO2Unleashed.dll";
-  //const std::string dllName = "S:\\Games\\FlatOut2_modding\\FO2Unleashed.dll";
+  const std::string dllName = "FO2Unleashed.dll";
 
   std::vector< const char * > childArgs{ processName.c_str() };
   std::copy( argv + 1, argv + argc, std::back_inserter( childArgs ) );
