@@ -1,10 +1,38 @@
 #include "patches.hpp"
 #include "signature.hpp"
 #include "addresses.hpp"
+#include "asmhooks.hpp"
 #include "logger.hpp"
 
+#include <ios>
 #include <cstring>
 #include <cstdint>
+
+namespace Opcode
+{
+  static const unsigned char CallRel32 = 0xE8;
+  static const unsigned char JmpRel32 = 0xE9;
+}
+
+
+static const void* extractRelCallAddress( const unsigned char* callStart )
+{
+  if( *callStart != Opcode::CallRel32 ) Logger::getSingleton().warning( "potential problem, trying to extract relative call address from something that's not a call" );
+  const unsigned char* nextInstruction = callStart + 5;
+  std::int32_t offset = *reinterpret_cast< const std::int32_t* >( callStart + 1 );
+  return nextInstruction + offset;
+}
+
+static void insertHook( unsigned char* code, const void* jumpTarget )
+{
+  // Hook into second invocation of mountFromFileList
+  *code = Opcode::JmpRel32;
+  std::int32_t* target = reinterpret_cast< std::int32_t* >( code + 1 );
+  unsigned char* nextInstr = code + 5;
+  *target = reinterpret_cast< const unsigned char* >( FO2_bridge_mount )-nextInstr;
+  // Save next instruction's address for jmp back into original code
+  FO2_detail_mountReturn = nextInstr;
+}
 
 static std::vector< Signature > s_signatures =
 {
@@ -28,17 +56,22 @@ static std::vector< Signature > s_signatures =
     , 0x53                 // 45 PUSH EBX
     , 0x33, 0xFF           // 46 XOR EDI, EDI
     },
-    []( char* location )
+    []( unsigned char* location )
     {
+      // Check that this is correct by verifying a string reference
       const char* filesystem = *reinterpret_cast< const char** >( location + 21 );
       if( strncmp( filesystem, "filesystem", 11 ) != 0 )
       {
         Logger::getSingleton().error( "Reference does not point to \"filesystem\" string!" );
         return false;
       }
-      std::int32_t offset = *reinterpret_cast< const std::int32_t* >( location + 26 );
-      const char* nextInstr = location + 30;
-      FO2_detail_mountFromFileList = reinterpret_cast< void( *)() >( nextInstr + offset );
+
+      // Extract location of mountFromFileList()
+      FO2_detail_mountFromFileList = extractRelCallAddress( location + 25 );
+      // Hook into second invocation of mountFromFileList
+      insertHook( location + 35, FO2_bridge_mount );
+      // Save next instruction's address for jmp back into original code
+      FO2_detail_mountReturn = location + 40;
       return true;
     }
   }

@@ -26,7 +26,7 @@ public:
   @param onMatch function to call on match, first parameter is offset to start of match, returns whether to continue search.
   @return Whether the search was cancelled by an onMatch function
   **/
-  bool run( const char* data, const size_t length, std::function< bool( ptrdiff_t, const void* ) > onMatch ) const;
+  bool run( const unsigned char* data, const size_t length, std::function< bool( ptrdiff_t, const void* ) > onMatch ) const;
 
 private:
   DFANode* mkNode( std::map< const void*, size_t >&& matches );

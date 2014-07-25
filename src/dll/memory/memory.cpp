@@ -63,7 +63,7 @@ static bool findFlatout2Module( char*& out_begin, std::ptrdiff_t& out_size )
     }
     out_begin = reinterpret_cast< char* >( info.lpBaseOfDll );
     out_size = info.SizeOfImage;
-    logger.info( "Found FlatOut2.exe module of size 0x", std::hex, out_size, " at 0x", reinterpret_cast< void* >( out_begin ), std::dec );
+    logger.verbose( "Found FlatOut2.exe module of size 0x", std::hex, out_size, " at 0x", reinterpret_cast< void* >( out_begin ), std::dec );
     return true;
   }
   logger.error( "Failed to find module FlatOut2.exe!" );
@@ -97,7 +97,7 @@ bool getExecutableRegions( std::vector< Region >& out_regions )
       auto modifiers = info.Protect & ~0xFF;
       try
       {
-        out_regions.emplace_back( reinterpret_cast< char* >( info.BaseAddress ), info.RegionSize, PAGE_EXECUTE_READWRITE | modifiers );
+        out_regions.emplace_back( reinterpret_cast< unsigned char* >( info.BaseAddress ), info.RegionSize, PAGE_EXECUTE_READWRITE | modifiers );
       }
       catch( std::runtime_error& e )
       {

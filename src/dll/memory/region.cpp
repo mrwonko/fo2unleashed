@@ -5,7 +5,7 @@
 
 #include <stdexcept>
 
-Region::Region( char* begin, std::ptrdiff_t size, std::uint32_t protection )
+Region::Region( unsigned char* begin, std::ptrdiff_t size, std::uint32_t protection )
   : m_begin( begin )
   , m_size( size )
 {

@@ -32,7 +32,7 @@ int main( int argc, char** argv )
     DFA dfa( std::move( nfa ) );
     std::cout << "Enter text to search in." << std::endl;
     std::getline( std::cin, input );
-    dfa.run( input.data(), input.size(), [ &input ]( ptrdiff_t position, const void* match )
+    dfa.run( reinterpret_cast< const unsigned char* >( input.data() ), input.size(), [ &input ]( ptrdiff_t position, const void* match )
     {
       const std::string& needle = *reinterpret_cast< const std::string* >( match );
       std::cout << "Found \"" << needle << "\" at " << position << std::endl;

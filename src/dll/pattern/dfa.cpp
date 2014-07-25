@@ -79,22 +79,22 @@ DFANode* DFA::mkNode( std::map< const void*, size_t >&& matches )
   return m_nodes.back().get();
 }
 
-bool DFA::run( const char* data, const size_t length, std::function< bool( ptrdiff_t, const void* ) > onMatch ) const
+bool DFA::run( const unsigned char* data, const size_t length, std::function< bool( ptrdiff_t, const void* ) > onMatch ) const
 {
   const DFANode* curNode = root();
-  const char * it = data;
-  const char * const end = data + length;
+  const unsigned char * it = data;
+  const unsigned char * const end = data + length;
   while( true )
   {
     for( auto& match : curNode->matches )
     {
-      if( !onMatch( reinterpret_cast< const char * >( it - match.second ) - data, match.first ) )
+      if( !onMatch( it - match.second - data, match.first ) )
       {
         return false;
       }
     }
     if( it == end ) break;
-    curNode = curNode->next[ *reinterpret_cast< const unsigned char * >( it ) ];
+    curNode = curNode->next[ *it ];
     ++it;
   }
   return true;

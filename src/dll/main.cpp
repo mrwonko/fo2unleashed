@@ -23,11 +23,17 @@ BOOL APIENTRY DllMain( HINSTANCE hinstDLL, DWORD  fdwReason, LPVOID lpvReserved 
   // TODO: Load & apply config
 
   std::vector< Region > regions;
-  if( !getExecutableRegions( regions ) ) return FALSE;
+  if( !getExecutableRegions( regions ) )
+  {
+    MessageBoxA( nullptr, "Failed to identify module FlatOut2.exe! Refer to fo2unleashed.log for additional information.", "FlatOut 2 Unleashed - Error", MB_OK | MB_ICONERROR );
+    return FALSE;
+  }
 
-  if( !applyPatches( regions ) ) return FALSE;
-
-  MessageBoxA( nullptr, "DLL Says hi!", "Hi!", MB_OK | MB_ICONINFORMATION );
+  if( !applyPatches( regions ) )
+  {
+    MessageBoxA( nullptr, "Failed to apply memory patches! Refer to fo2unleashed.log for additional information.", "FlatOut 2 Unleashed - Error", MB_OK | MB_ICONERROR );
+    return FALSE;
+  }
 
   return TRUE;
 }

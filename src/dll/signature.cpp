@@ -27,7 +27,7 @@ bool findSignatures( const std::vector< Region >& regions, const std::vector< Si
   {
     DFA dfa( std::move( nfa ) );
 
-    std::map< const Signature*, char* > matches;
+    std::map< const Signature*, unsigned char* > matches;
 
     // Search through all regions
     for( auto& region : regions )
@@ -37,7 +37,7 @@ bool findSignatures( const std::vector< Region >& regions, const std::vector< Si
       {
         const Signature* sig = reinterpret_cast< const Signature* >( opaque );
         mandatory.erase( sig );
-        char* position = region.begin() + offset;
+        unsigned char* position = region.begin() + offset;
         if( !matches.emplace( sig, position ).second )
         {
           Logger::getSingleton().error( "Found multiple matches for code signature ", sig->name, "!" );

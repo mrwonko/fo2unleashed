@@ -10,19 +10,20 @@ option casemap : none	; case sensitive
 ;    extern variables
 include addresses.inc
 
-;    Functions
-;    (decorators for FlatOut 2 functions)
+;    extern hooks
+include hooks.inc
+ 
+;    Hooks
+;    (Jumped into from FlatOut 2 code, call C-hooks)
 
-; mountFromFileList( const char* filename )
-;
-; mounting the bfs files listed in a file
-; filename is supplied via ESI in FO2 function
-FO2_mountFromFileList proc filename : dword
-	push esi
-	mov esi, filename
-	call [FO2_detail_mountFromFileList]
-	pop esi
-	ret
-FO2_mountFromFileList endp
+; mount
+; jumped into after mounting files listed in "filesystem" 
+; and setting esi = "patch" instead of calling
+; FO2_detail_mountFromFileList
+FO2_bridge_mount proc
+	call [FO2_detail_mountFromFileList] ; original instruction
+	invoke hook_mount
+	jmp [FO2_detail_mountReturn]
+FO2_bridge_mount endp
 
 end						; marks end of file, optionally links entry point

@@ -11,7 +11,7 @@ struct Signature
   const char* name;
   bool mandatory;
   std::vector< PatternChar > pattern;
-  std::function< bool( char* ) > onFound;
+  std::function< bool( unsigned char* ) > onFound;
 };
 
 bool findSignatures( const std::vector< Region >& regions, const std::vector< Signature >& signatures );
